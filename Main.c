@@ -5,13 +5,11 @@
 #define NUM_MAXIMO_TERMINAIS 10
 #define TEMPO_MAXIMO 9999
 
-// Terminais de Curitiba
 const char *terminais[NUM_MAXIMO_TERMINAIS] = {
     "Boqueirao", "CIC", "Pinheirinho", "Cabral", "Guadalupe",
     "Capao Raso", "Santa Candida", "Fazendinha", "Campo Comprido", "Hauer"
 };
 
-// Matriz de tempo entre terminais
 int tempo[NUM_MAXIMO_TERMINAIS][NUM_MAXIMO_TERMINAIS] = {
     {0, 10, 15, 0, 0, 20, 0, 0, 0, 25}, //Boqueirao
     {10, 0, 5, 0, 0, 15, 0, 10, 0, 0}, //CIC
@@ -25,7 +23,6 @@ int tempo[NUM_MAXIMO_TERMINAIS][NUM_MAXIMO_TERMINAIS] = {
     {25, 0, 0, 0, 5, 0, 0, 0, 5, 0} // Hauer
 };
 
-// Protótipos das funções
 void menu();
 void melhor_rota_menos_tempo(int terminal_origem, int terminal_destino);
 void melhor_rota_todos_terminais();
@@ -97,7 +94,6 @@ void melhor_rota_menos_tempo(int terminal_origem, int terminal_destino) {
     int predecessor[NUM_MAXIMO_TERMINAIS];      
     int caminho[NUM_MAXIMO_TERMINAIS];       
 
-    // Inicialização dos arrays
     for (int i = 0; i < NUM_MAXIMO_TERMINAIS; i++) {
         tempo_minimo[i] = TEMPO_MAXIMO;  
         visitado[i] = false;        
@@ -213,7 +209,6 @@ void melhor_rota_menos_baldeacoes(int origem, int destino) {
         }
     }
 
-    // Reconstruir caminho
     int caminho[NUM_MAXIMO_TERMINAIS];
     int tam = 0, atual = destino;
     while (atual != -1) {
