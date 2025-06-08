@@ -68,8 +68,13 @@ void menu() {
                 break;
 
             case 2:
-                // Implementação futura
-                printf("Funcionalidade em desenvolvimento!\n");
+                listar_terminais();
+                printf("\nDigite o número do terminal de origem: ");
+                scanf("%d", &origem);
+                printf("Digite o número do terminal de destino: ");
+                scanf("%d", &destino);
+                melhor_rota_menos_baldeacoes(origem, destino);
+               
                 break;
 
             case 3:
@@ -182,4 +187,49 @@ void melhor_rota_todos_terminais() {
         if (i != NUM_MAXIMO_TERMINAIS - 1) printf(" -> ");
     }
     printf("\nTempo total estimado: %d minutos\n", tempo_total);
+}
+void melhor_rota_menos_baldeacoes(int origem, int destino) {
+    bool visitado[V] = {false};
+    int fila[V];
+    int anterior[V];
+    int inicio = 0, fim = 0;
+
+    for (int i = 0; i < V; i++) anterior[i] = -1;
+
+    fila[fim++] = origem;
+    visitado[origem] = true;
+
+    while (inicio < fim) {
+        int atual = fila[inicio++];
+
+        if (atual == destino) break;
+
+        for (int i = 0; i < V; i++) {
+            if (tempo[atual][i] > 0 && !visitado[i]) {
+                fila[fim++] = i;
+                visitado[i] = true;
+                anterior[i] = atual;
+            }
+        }
+    }
+
+    // Reconstruir caminho
+    int caminho[V];
+    int tam = 0, atual = destino;
+    while (atual != -1) {
+        caminho[tam++] = atual;
+        atual = anterior[atual];
+    }
+
+    if (tam == 0 || caminho[tam - 1] != origem) {
+        printf("Caminho não encontrado.\n");
+        return;
+    }
+
+    printf("Caminho com menos baldeações (%d paradas):\n", tam - 1);
+    for (int i = tam - 1; i >= 0; i--) {
+        printf("%s", terminais[caminho[i]]);
+        if (i > 0) printf(" -> ");
+    }
+    printf("\n");
 }
