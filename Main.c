@@ -189,12 +189,12 @@ void melhor_rota_todos_terminais() {
     printf("\nTempo total estimado: %d minutos\n", tempo_total);
 }
 void melhor_rota_menos_baldeacoes(int origem, int destino) {
-    bool visitado[V] = {false};
-    int fila[V];
-    int anterior[V];
+    bool visitado[NUM_MAXIMO_TERMINAIS] = {false};
+    int fila[NUM_MAXIMO_TERMINAIS];
+    int anterior[NUM_MAXIMO_TERMINAIS];
     int inicio = 0, fim = 0;
 
-    for (int i = 0; i < V; i++) anterior[i] = -1;
+    for (int i = 0; i < NUM_MAXIMO_TERMINAIS; i++) anterior[i] = -1;
 
     fila[fim++] = origem;
     visitado[origem] = true;
@@ -204,7 +204,7 @@ void melhor_rota_menos_baldeacoes(int origem, int destino) {
 
         if (atual == destino) break;
 
-        for (int i = 0; i < V; i++) {
+        for (int i = 0; i < NUM_MAXIMO_TERMINAIS; i++) {
             if (tempo[atual][i] > 0 && !visitado[i]) {
                 fila[fim++] = i;
                 visitado[i] = true;
@@ -214,7 +214,7 @@ void melhor_rota_menos_baldeacoes(int origem, int destino) {
     }
 
     // Reconstruir caminho
-    int caminho[V];
+    int caminho[NUM_MAXIMO_TERMINAIS];
     int tam = 0, atual = destino;
     while (atual != -1) {
         caminho[tam++] = atual;
