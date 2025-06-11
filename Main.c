@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <string.h>
 
-#define NUM_MAXIMO_TERMINAIS 10
+#define NUM_MAXIMO_TERMINAIS 11
 #define TEMPO_MAXIMO 9999
 
-const char *terminais[NUM_MAXIMO_TERMINAIS] = {
+char terminais[NUM_MAXIMO_TERMINAIS][50] = {
     "Boqueirao", "CIC", "Pinheirinho", "Cabral", "Guadalupe",
     "Capao Raso", "Santa Candida", "Fazendinha", "Campo Comprido", "Hauer"
 };
@@ -23,11 +24,14 @@ int tempo[NUM_MAXIMO_TERMINAIS][NUM_MAXIMO_TERMINAIS] = {
     {25, 0, 0, 0, 5, 0, 0, 0, 5, 0} // Hauer
 };
 
+int num_terminais = 10;
+
 void menu();
 void melhor_rota_menos_tempo(int terminal_origem, int terminal_destino);
 void melhor_rota_todos_terminais();
 void listar_terminais();
 void melhor_rota_menos_baldeacoes(int origem, int destino);
+void adicionar_terminal();
 
 int main() {
     menu();
@@ -36,9 +40,34 @@ int main() {
 
 void listar_terminais() {
     printf("\nTerminais disponiveis:\n");
-    for (int i = 0; i < NUM_MAXIMO_TERMINAIS; i++) {
+    for (int i = 0; i < num_terminais; i++) {
         printf("%d. %s\n", i, terminais[i]);
     }
+}
+
+void adicionar_terminal() {
+    if (num_terminais >= NUM_MAXIMO_TERMINAIS) {
+        printf("Limite maximo de terminais atingido.\n");
+        return;
+    }
+
+    char nome[50];
+    printf("Digite o nome do novo terminal: ");
+    getchar(); // limpar buffer
+    fgets(nome, sizeof(nome), stdin);
+    nome[strcspn(nome, "\n")] = 0; // remover newline
+
+    strcpy(terminais[num_terminais], nome);
+
+    printf("Digite o tempo entre '%s' e os demais terminais existentes (em minutos, 0 se nao ha conexao):\n", nome);
+    for (int i = 0; i < num_terminais; i++) {
+        printf("Tempo ate '%s': ", terminais[i]);
+        scanf("%d", &tempo[num_terminais][i]);
+        tempo[i][num_terminais] = tempo[num_terminais][i]; // simetria
+    }
+
+    num_terminais++;
+    printf("Terminal '%s' adicionado com sucesso!\n", nome);
 }
 
 void menu() {
@@ -50,6 +79,7 @@ void menu() {
         printf("1. Buscar menor tempo entre dois terminais\n");
         printf("2. Buscar com menos baldeacoes\n");
         printf("3. Melhor rota para visitar todos os terminais\n");
+        printf("4. Adicionar novo terminal\n");
         printf("0. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &escolha);
@@ -77,6 +107,10 @@ void menu() {
                 melhor_rota_todos_terminais();
                 break;
 
+            case 4:
+                adicionar_terminal();
+                break;
+
             case 0:
                 printf("Saindo...\n");
                 break;
@@ -93,18 +127,18 @@ void melhor_rota_menos_tempo(int terminal_origem, int terminal_destino) {
     int predecessor[NUM_MAXIMO_TERMINAIS];      
     int caminho[NUM_MAXIMO_TERMINAIS];       
 
-    for (int i = 0; i < NUM_MAXIMO_TERMINAIS; i++) {
+    for (int i = 0; i < num_terminais; i++) {
         tempo_minimo[i] = TEMPO_MAXIMO;  
         visitado[i] = false;        
         predecessor[i] = -1;          
     }
     tempo_minimo[terminal_origem] = 0;   
 
-    for (int passo = 0; passo < NUM_MAXIMO_TERMINAIS; passo++) {
+    for (int passo = 0; passo < num_terminais; passo++) {
         int tempo_mais_baixo = TEMPO_MAXIMO;
         int terminal_atual = -1;
         
-        for (int t = 0; t < NUM_MAXIMO_TERMINAIS; t++) {
+        for (int t = 0; t < num_terminais; t++) {
             if (!visitado[t] && tempo_minimo[t] < tempo_mais_baixo) {
                 tempo_mais_baixo = tempo_minimo[t];
                 terminal_atual = t;
@@ -114,7 +148,7 @@ void melhor_rota_menos_tempo(int terminal_origem, int terminal_destino) {
         if (terminal_atual == -1) break;
         visitado[terminal_atual] = true;
 
-        for (int vizinho = 0; vizinho < NUM_MAXIMO_TERMINAIS; vizinho++) {
+        for (int vizinho = 0; vizinho < num_terminais; vizinho++) {
             if (tempo[terminal_atual][vizinho] > 0 && !visitado[vizinho]) {
                 int tempo_candidato = tempo_minimo[terminal_atual] + tempo[terminal_atual][vizinho];
                 
@@ -156,11 +190,11 @@ void melhor_rota_todos_terminais() {
     rota[0] = atual;
     visitado[atual] = true;
 
-    for (int i = 1; i < NUM_MAXIMO_TERMINAIS; i++) {
+    for (int i = 1; i < num_terminais; i++) {
         int menor_tempo = INT_MAX;
         int proximo = -1;
 
-        for (int j = 0; j < NUM_MAXIMO_TERMINAIS; j++) {
+        for (int j = 0; j < num_terminais; j++) {
             if (!visitado[j] && tempo[atual][j] > 0 && tempo[atual][j] < menor_tempo) {
                 menor_tempo = tempo[atual][j];
                 proximo = j;
@@ -176,9 +210,9 @@ void melhor_rota_todos_terminais() {
     }
 
     printf("\n[Melhor Caminho para Visitar Todos os Terminais - Aprox Vizinho Mais Proximo]:\n");
-    for (int i = 0; i < NUM_MAXIMO_TERMINAIS; i++) {
+    for (int i = 0; i < num_terminais; i++) {
         printf("%s", terminais[rota[i]]);
-        if (i != NUM_MAXIMO_TERMINAIS - 1) printf(" -> ");
+        if (i != num_terminais - 1) printf(" -> ");
     }
     printf("\nTempo total estimado: %d minutos\n", tempo_total);
 }
@@ -189,7 +223,7 @@ void melhor_rota_menos_baldeacoes(int origem, int destino) {
     int anterior[NUM_MAXIMO_TERMINAIS];
     int inicio = 0, fim = 0;
 
-    for (int i = 0; i < NUM_MAXIMO_TERMINAIS; i++) anterior[i] = -1;
+    for (int i = 0; i < num_terminais; i++) anterior[i] = -1;
 
     fila[fim++] = origem;
     visitado[origem] = true;
@@ -199,7 +233,7 @@ void melhor_rota_menos_baldeacoes(int origem, int destino) {
 
         if (atual == destino) break;
 
-        for (int i = 0; i < NUM_MAXIMO_TERMINAIS; i++) {
+        for (int i = 0; i < num_terminais; i++) {
             if (tempo[atual][i] > 0 && !visitado[i]) {
                 fila[fim++] = i;
                 visitado[i] = true;
@@ -227,4 +261,3 @@ void melhor_rota_menos_baldeacoes(int origem, int destino) {
     }
     printf("\n");
 }
-        
